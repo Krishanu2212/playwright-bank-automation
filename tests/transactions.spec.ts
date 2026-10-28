@@ -1,5 +1,5 @@
 import { test } from '../fixtures/bank.fixture';
-import { testData } from '../test-data/data';
+import { transactionData } from '../test-data/data';
 
 test.beforeEach(
   'Log in and open transaction history',
@@ -30,13 +30,16 @@ test(
 );
 
 test(
-  `searching for "${testData.Description}" displays only matching descriptions`,
+  `searching for "${transactionData.matchingDescription}" displays only matching descriptions`,
   async ({ transactionsPage }) => {
     await transactionsPage.selectType('Credits & debits');
 
-    await transactionsPage.search(testData.Description);
+    await transactionsPage.search(
+      transactionData.matchingDescription
+    );
+
     await transactionsPage.expectDescriptionsContaining(
-      testData.Description
+      transactionData.matchingDescription
     );
   }
 );
@@ -46,7 +49,10 @@ test(
   async ({ transactionsPage }) => {
     await transactionsPage.selectType('Credits & debits');
 
-    await transactionsPage.search('qwerty');
+    await transactionsPage.search(
+      transactionData.unmatchedDescription
+    );
+
     await transactionsPage.expectNoResults();
   }
 );

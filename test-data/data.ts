@@ -1,13 +1,22 @@
-type LoginCredentials = {
-    CustomerID: string,
-    Password: string,
-    SecurityAnswer: string,
-    Description: string
-}
 
-export const testData: LoginCredentials = {
-    CustomerID: '100200300',
-    Password: 'Bank@123',
-    SecurityAnswer: 'greenwood',
-    Description: 'Swiggy'
-}
+type LoginCredentials = {
+  customerId: string;
+  password: string;
+  securityAnswer: string;
+};
+
+export const loginCredentials: LoginCredentials = {
+  customerId: '100200300',
+  password: 'Bank@123',
+  securityAnswer: 'greenwood',
+};
+
+type TransactionData = {
+  matchingDescription: string,
+  unmatchedDescription: string,
+};
+
+export const transactionData: TransactionData = {
+  matchingDescription: 'Swiggy',
+  unmatchedDescription: 'qwerty',
+};

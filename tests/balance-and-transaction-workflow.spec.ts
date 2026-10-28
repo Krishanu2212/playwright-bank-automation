@@ -1,5 +1,6 @@
 import { test } from '../fixtures/bank.fixture';
-import { testData } from '../test-data/data';
+import { transactionData } from '../test-data/data';
+
 
 test(
   'customer can hide and show balances, filter and search transactions, and log out',
@@ -45,13 +46,13 @@ test(
     );
 
     await test.step(
-      `Select Credits & debits and search for "${testData.Description}"`,
+      `Select Credits & debits and search for "${transactionData.matchingDescription}"`,
       async () => {
         await transactionsPage.selectType('Credits & debits');
 
-        await transactionsPage.search(testData.Description);
+        await transactionsPage.search(transactionData.matchingDescription);
         await transactionsPage.expectDescriptionsContaining(
-          testData.Description
+          transactionData.matchingDescription
         );
       }
     );

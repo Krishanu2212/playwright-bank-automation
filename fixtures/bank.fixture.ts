@@ -2,7 +2,7 @@ import { test as base, expect } from '@playwright/test';
 import { LoginPage } from '../pages/login.page';
 import { DashboardPage } from '../pages/dashboard.page';
 import { TransactionsPage } from '../pages/transaction.page';
-import { testData } from '../test-data/data';
+import { loginCredentials } from '../test-data/data';
 
 type BankSession = {
   login(): Promise<void>;
@@ -44,12 +44,12 @@ export const test = base.extend<BankFixtures>({
             await loginPage.goto();
 
             await loginPage.login(
-              testData.CustomerID,
-              testData.Password
+              loginCredentials.customerId,
+              loginCredentials.password
             );
 
             await loginPage.answerSecurityQuestion(
-              testData.SecurityAnswer
+              loginCredentials.securityAnswer
             );
 
             await expect(dashboardPage.logoutButton).toBeVisible();
