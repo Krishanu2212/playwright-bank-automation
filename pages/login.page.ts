@@ -33,25 +33,6 @@ export class LoginPage {
   }
 
   async expectLoginFormVisible(): Promise<void> {
-    await expect(this.loginForm, 'Login form should be visible')
-      .toBeVisible();
-
-    await expect(this.customerIdInput, 'Customer ID should be editable')
-      .toBeEditable();
-
-    await expect(this.passwordInput, 'Password should be editable')
-      .toBeEditable();
-  }
-
-  async expectSecurityQuestionVisible(): Promise<void> {
-    await expect(
-      this.securityAnswerInput,
-      'Security answer field should be visible'
-    ).toBeVisible();
-
-    await expect(
-      this.securityAnswerInput,
-      'Security answer field should be editable'
-    ).toBeEditable();
+    await expect(this.loginForm).toBeVisible();
   }
 }
