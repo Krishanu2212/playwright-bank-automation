@@ -1,27 +1,25 @@
 # Playwright Bank Automation
 
-UI automation for the [Practice QA Automation banking application](https://www.practiceqaautomation.com/apps/bank/dashboard), built with Playwright and TypeScript.
+Automation tests for the [Practice QA Automation banking application](https://www.practiceqaautomation.com/apps/bank/dashboard), using Playwright and TypeScript.
 
-The suite covers the complete assignment workflow and independent feature tests.
+## What the Tests Cover
 
-## Test Coverage
+- Login with customer credentials and a security answer.
+- Hide balances and verify they are masked.
+- Show balances and verify numeric amounts.
+- Select Credits only and verify amounts start with `+`.
+- Select Debits only and verify amounts start with `−`.
+- Search for Swiggy and verify matching descriptions.
+- Search for unmatched text and verify no results.
+- Logout and verify that reopening the dashboard requires login.
 
-| Test file | Coverage |
-| --- | --- |
-| `bank-journey.spec.ts` | Login, security verification, hide/reveal balances, credit/debit filters, description search, and logout |
-| `balances.spec.ts` | Verify balances are masked and their original values return when revealed |
-| `transactions.spec.ts` | Credit filtering, debit filtering, matching description search, and no-results search |
-| `authentication.spec.ts` | Logout and verification that reopening the dashboard requires login |
-
-The full journey verifies the requested sequence in one session. Independent tests isolate feature failures and can run separately.
-
-## Tech Stack
+## Tools Used
 
 - Playwright Test
 - TypeScript
-- Page Object Model
-- Custom Playwright fixtures
-- GitHub Actions workflow
+- GitHub Actions
+
+Tests are configured for Chromium, Firefox, and WebKit.
 
 ## Project Structure
 
@@ -39,123 +37,113 @@ test-data/
 tests/
   authentication.spec.ts
   balances.spec.ts
-  bank-journey.spec.ts
   transactions.spec.ts
+  balance-and-transaction-workflow.spec.ts
 playwright.config.ts
 package.json
 package-lock.json
 README.md
 ```
 
-## Getting Started
+## Setup
 
-Install a Node.js LTS version supported by the project's Playwright version, along with npm and Git.
-
-Clone the repository:
+Install a Node.js version supported by Playwright, then clone the repository:
 
 ```bash
 git clone https://github.com/Krishanu2212/playwright-bank-automation.git
 cd playwright-bank-automation
 ```
 
-Install dependencies and browser binaries:
+Install dependencies and browsers:
 
 ```bash
 npm ci
 npx playwright install
 ```
 
-On Linux, install browser system dependencies if needed:
-
-```bash
-npx playwright install --with-deps
-```
-
-The tests require internet access to the demo application. Public demo credentials and search data are maintained in `test-data/data.ts`.
+The tests require internet access. Public demo credentials and search text are stored in `test-data/data.ts`.
 
 ## Running Tests
 
-Run the complete suite:
+Run all tests:
 
 ```bash
 npx playwright test
 ```
 
-Run the full assignment journey:
+Run the complete banking workflow:
 
 ```bash
-npx playwright test tests/bank-journey.spec.ts
+npx playwright test tests/balance-and-transaction-workflow.spec.ts
 ```
 
-Run independent transaction tests:
+Run transaction tests:
 
 ```bash
 npx playwright test tests/transactions.spec.ts
 ```
 
-Run with visible browser windows:
+Run only in Chromium:
+
+```bash
+npx playwright test --project=chromium
+```
+
+Run with a visible browser:
 
 ```bash
 npx playwright test --headed
 ```
 
-Run using Playwright's interactive UI:
-
-```bash
-npx playwright test --ui
-```
-
-Browser projects and execution settings are defined in `playwright.config.ts`.
-
-## Reports and Debugging
-
-Open the HTML report after a test run:
+Open the HTML report:
 
 ```bash
 npx playwright show-report
 ```
 
-Named `test.step()` sections make the longer scenarios easier to follow.
+## How the Code Is Organized
 
-Screenshot and trace collection are controlled by `playwright.config.ts`. When enabled, failure artifacts help investigate the page state and actions leading to a failure.
+### Page Objects
 
-## Design Decisions
+The `pages` folder contains locators, actions, and checks for each page.
+Tests call these methods instead of repeating the same browser interactions.
 
-### Page Object Model
+### Shared Login and Logout
 
-Page objects contain page-specific locators, actions, and reusable verification methods. Tests describe the user scenarios.
+The `bankSession` fixture provides shared login and logout methods.
+Each test uses its own browser context and does not depend on another test.
 
-### Custom Fixtures
+### Balance Checks
 
-Fixtures provide page-object instances using each test's Playwright page. They do not log in automatically; authentication is explicit in tests or their setup hooks.
+Regular expressions check whether balances are masked or display amounts
+starting with `₹`. The tests do not compare account amounts before and after hiding.
 
-### Balance Verification
+### Transaction Checks
 
-Balances are captured before hiding and compared after revealing. This avoids hardcoding account amounts and verifies that the original displayed values return.
+Dropdown options are selected and checked using their displayed labels.
 
-### Transaction Verification
+The tests check every displayed amount or description. `expect.poll()` retries
+these checks while the table updates. A matching result must contain at least one row.
 
-Positive-result checks require at least one row and verify every rendered amount or description cell. No-results searches have separate assertions.
+The no-results test checks the message and verifies that no transaction rows remain.
 
-### Test Independence
+## Why Both Workflow and Independent Tests?
 
-Feature tests prepare their own authenticated state. They do not depend on another test running first.
+The workflow test checks the assignment's complete sequence in one session.
 
-## Continuous Integration
+Independent tests check individual features, making failures easier to investigate.
+They also cover unmatched searches and dashboard access after logout.
+Some checks are intentionally repeated between the two test styles.
 
-A GitHub Actions workflow is included in:
+## Reports and GitHub Actions
 
-```text
-.github/workflows/playwright.yml
-```
+Screenshots and traces are retained for failed tests.
 
-Check the repository's **Actions** tab for workflow execution results. Local test results and CI results should be assessed separately.
+The GitHub Actions workflow installs dependencies and browsers, runs the tests,
+and uploads the HTML report. Results are available in the repository's Actions tab.
 
-## Scope and Assumptions
+## Current Limitations
 
-- Tests run against an external demo application, so availability and demo-data changes can affect results.
-- Transaction locators currently use the fifth column for amounts and the third column for descriptions.
-- Transaction checks cover rendered table rows; they do not traverse additional pages.
-- The current row-count checks assume filtering has completed before the count is read.
-- Balance restoration checks assume account values do not change independently during the hide/reveal sequence.
-- Tests verify UI behavior rather than the financial correctness of account balances.
+- Tests depend on the external demo website being available.
+- Transaction checks cover the displayed page, not every page of results.
+- Amount and description checks depend on their current column positions.
